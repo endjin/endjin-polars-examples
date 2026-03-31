@@ -39,7 +39,9 @@
 			"settings": {
 				"files.exclude": {
 					".uv-cache": true
-				}
+				},
+				"python.defaultInterpreterPath": "${containerWorkspaceFolder}/.venv/bin/python",
+				"behave-vsc.featuresPath": "tests/bdd"
 			}
 		}
 	}

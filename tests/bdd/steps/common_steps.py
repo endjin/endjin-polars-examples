@@ -17,7 +17,7 @@ def _behave_table_to_polars_dataframe_with_explicit_schema(table: Any) -> pl.Dat
         raise ValueError("field_name:field_type expected in table headings")
 
     schema = {name: _string_to_polars_type(field_type) for name, field_type in cols}
-    rows = [{name: cell if cell != "" else None for (name, _), cell in zip(cols, row.cells)} for row in table]
+    rows = [{name: (None if cell in ("", "null") else cell) for (name, _), cell in zip(cols, row.cells)} for row in table]
 
     if not rows:
         return pl.DataFrame(schema=schema)
