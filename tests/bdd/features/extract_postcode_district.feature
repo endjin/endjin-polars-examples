@@ -16,7 +16,7 @@ Feature: Extract postcode area
     Given a dataset with the following rows
       | postcode:string |
       | SW1A2AA         |
-      | EC1A1BB         |
+      | 123456          |
     When I extract the postcode area from the full postcode
     Then the resulting dataset should include the following rows
       | postcode_area:string |

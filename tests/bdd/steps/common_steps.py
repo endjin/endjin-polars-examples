@@ -74,11 +74,9 @@ def _behave_table_to_polars_dataframe_with_inferred_schema(table: Any) -> pl.Dat
 
 
 def compare_polars_dataframes(expected: pl.DataFrame, actual: pl.DataFrame):
-    sorted_expected_cols = sorted(expected.columns)
-    sorted_actual_cols = sorted(actual.columns)
-    expected = expected.select(sorted_expected_cols).sort(by=sorted_expected_cols)
-    actual = actual.select(sorted_actual_cols).sort(by=sorted_actual_cols)
-    actual = actual.select(expected.columns)
+    cols = sorted(expected.columns)
+    expected = expected.select(cols).sort(by=cols)
+    actual = actual.select(cols).sort(by=cols)
     pl_testing.assert_frame_equal(expected, actual, check_dtypes=False)
 
 

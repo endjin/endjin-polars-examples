@@ -1,21 +1,6 @@
 import polars as pl
 from datetime import date
 
-def validate_price_paid_data(df: pl.DataFrame) -> pl.DataFrame:
-    """
-    Validates the input DataFrame against the defined schema for price paid data.
-
-    Args:
-        df: The input Polars DataFrame to validate.
-    Returns:
-        The validated Polars DataFrame if it conforms to the schema.
-    Raises:
-        pandera.errors.SchemaError: If the DataFrame does not conform to the schema.
-    """
-    from .schema_price_paid_data import price_paid_data_schema
-    return price_paid_data_schema.validate(df)
-
-
 def filter_other_property_types(df: pl.DataFrame) -> pl.DataFrame:
     """
     Filters the DataFrame to include only rows where 'PropertyType' is not 'Other'.
@@ -83,7 +68,19 @@ def extract_postcode_area(df: pl.DataFrame) -> pl.DataFrame:
         A Polars DataFrame with a new column 'postcode_area' extracted from the 'postcode' column.
     """
     return df.with_columns(
-        pl.col("postcode").str.extract(r"^([A-Z]{1,2})\d", 1).alias("postcode_area")
+        pl.col("postcode").str.extract(r"^([A-Z]{1,2}[0-9R][0-9A-Z]?) [0-9][ABD-HJLNP-UW-Z]{2}$", 1).alias("postcode_area")
+    )
+
+def extract_postcode_district(df: pl.DataFrame) -> pl.DataFrame:
+    """
+    Extracts the postcode district from the 'postcode' column and adds it as a new column 'postcode_district'.
+    Uses regex expression to extract the district part of the postcode, which is typically the first part of the postcode before the space.
+        df: The input Polars DataFrame. It is expected to have a column named 'postcode' of type String.
+    Returns:
+        A Polars DataFrame with a new column 'postcode_district' extracted from the 'postcode' column.
+    """
+    return df.with_columns(
+        pl.col("postcode").str.extract(r"^([A-Z]{1,2}\d{1,2})\s", 1).alias("postcode_district")
     )
     
 def drop_records_without_postcode(df: pl.DataFrame) -> pl.DataFrame:
@@ -123,7 +120,7 @@ def rename_property_type(df: pl.DataFrame) -> pl.DataFrame:
         - 'O' to 'Other'
     """
     return df.with_columns(
-        pl.col("property_type").map_dict({
+        pl.col("property_type").replace({
             "D": "Detached",
             "S": "Semi-Detached",
             "T": "Terraced",
@@ -145,7 +142,7 @@ def rename_duration(df: pl.DataFrame) -> pl.DataFrame:
         - 'U' to 'Unknown'
     """
     return df.with_columns(
-        pl.col("duration").map_dict({
+        pl.col("duration").replace({
             "F": "Freehold",
             "L": "Leasehold",
             "U": "Unknown"
@@ -164,7 +161,7 @@ def rename_old_new(df: pl.DataFrame) -> pl.DataFrame:
         - 'N' to 'Old'
     """
     return df.with_columns(
-        pl.col("old_new").map_dict({
+        pl.col("old_new").replace({
             "Y": "New",
             "N": "Old"
         }).alias("old_new")
@@ -187,7 +184,7 @@ def summarise_data(df: pl.DataFrame) -> pl.DataFrame:
     Returns:
         A Polars DataFrame summarised by year, property type, town_city and county with the total number of sales and the max, min and median price.
     """
-    return df.group_by(["YearOfSale", "property_type", "town_city", "county"]).agg(
+    return df.group_by(["year", "property_type", "town_city", "county"]).agg(
         pl.col("id").n_unique().alias("total_sales"),
         pl.col("price").max().alias("max_price"),
         pl.col("price").min().alias("min_price"),

@@ -1,5 +1,4 @@
 from data_wrangler.data_wrangler import (
-    validate_price_paid_data,
     filter_other_property_types,
     extract_year_from_date,
     build_date_dimension_table,
@@ -14,7 +13,6 @@ from data_wrangler.data_wrangler import (
 from data_wrangler.schema_price_paid_data import price_paid_data_schema
 
 __all__ = [
-    "validate_price_paid_data",
     "filter_other_property_types",
     "extract_year_from_date",
     "build_date_dimension_table",
