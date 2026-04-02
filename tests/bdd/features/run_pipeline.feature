@@ -5,7 +5,7 @@ Feature: Run data wrangler pipeline end-to-end
     Given land registry CSV files exist in the test data folder
     When I run the pipeline
     Then the result should be a non-empty summary DataFrame
-    And the summary should contain the columns year, property_type, town_city, county, total_sales, max_price, min_price, median_price
+    And the summary should contain the columns year, property_type, total_sales, max_price, min_price, median_price
     And all property_type values should be from the renamed set Detached, Semi-Detached, Terraced, Flat
     And all year values should be positive integers
     And all total_sales values should be greater than zero

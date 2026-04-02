@@ -1,7 +1,7 @@
 @unit
 Feature: Summarise data
 
-  Scenario: Summarise sales by year, property type, town/city and county
+  Scenario: Summarise sales by year and property type
     Given a dataset with the following rows
       | id:string | year:int | property_type:string | town_city:string | county:string      | price:integer |
       | 1         |     2024 | D                    | LONDON           | GREATER LONDON     |        500000 |
@@ -26,19 +26,15 @@ Feature: Summarise data
       | 20        |     2022 | T                    | LEEDS            | WEST YORKSHIRE     |        145000 |
     When I summarise the data
     Then the resulting dataset should include the following rows
-      | year:int | property_type:string | town_city:string | county:string      | total_sales:int | max_price:int | min_price:int | median_price:float |
-      |     2024 | D                    | LONDON           | GREATER LONDON     |               2 |        500000 |        300000 |           400000.0 |
-      |     2024 | S                    | LONDON           | GREATER LONDON     |               1 |        250000 |        250000 |           250000.0 |
-      |     2024 | T                    | LONDON           | GREATER LONDON     |               1 |        175000 |        175000 |           175000.0 |
-      |     2024 | F                    | MANCHESTER       | GREATER MANCHESTER |               2 |        195000 |        180000 |           187500.0 |
-      |     2024 | S                    | MANCHESTER       | GREATER MANCHESTER |               1 |        220000 |        220000 |           220000.0 |
-      |     2024 | D                    | LEEDS            | WEST YORKSHIRE     |               3 |        340000 |        280000 |           310000.0 |
-      |     2023 | D                    | LONDON           | GREATER LONDON     |               2 |        450000 |        400000 |           425000.0 |
-      |     2023 | S                    | LONDON           | GREATER LONDON     |               1 |        230000 |        230000 |           230000.0 |
-      |     2023 | T                    | MANCHESTER       | GREATER MANCHESTER |               1 |        160000 |        160000 |           160000.0 |
-      |     2023 | F                    | MANCHESTER       | GREATER MANCHESTER |               1 |        155000 |        155000 |           155000.0 |
-      |     2023 | D                    | LEEDS            | WEST YORKSHIRE     |               1 |        295000 |        295000 |           295000.0 |
-      |     2022 | D                    | LONDON           | GREATER LONDON     |               1 |        480000 |        480000 |           480000.0 |
-      |     2022 | S                    | LONDON           | GREATER LONDON     |               1 |        210000 |        210000 |           210000.0 |
-      |     2022 | D                    | MANCHESTER       | GREATER MANCHESTER |               1 |        265000 |        265000 |           265000.0 |
-      |     2022 | T                    | LEEDS            | WEST YORKSHIRE     |               1 |        145000 |        145000 |           145000.0 |
+      | year:int | property_type:string | total_sales:int | max_price:int | min_price:int | median_price:float |
+      |     2024 | D                    |               5 |        500000 |        280000 |           310000.0 |
+      |     2024 | S                    |               2 |        250000 |        220000 |           235000.0 |
+      |     2024 | T                    |               1 |        175000 |        175000 |           175000.0 |
+      |     2024 | F                    |               2 |        195000 |        180000 |           187500.0 |
+      |     2023 | D                    |               3 |        450000 |        295000 |           400000.0 |
+      |     2023 | S                    |               1 |        230000 |        230000 |           230000.0 |
+      |     2023 | T                    |               1 |        160000 |        160000 |           160000.0 |
+      |     2023 | F                    |               1 |        155000 |        155000 |           155000.0 |
+      |     2022 | D                    |               2 |        480000 |        265000 |           372500.0 |
+      |     2022 | S                    |               1 |        210000 |        210000 |           210000.0 |
+      |     2022 | T                    |               1 |        145000 |        145000 |           145000.0 |

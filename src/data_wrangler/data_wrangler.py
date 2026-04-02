@@ -40,7 +40,7 @@ class DataWrangler:
         Loads all CSVs from data_folder and runs the full transformation and
         summarisation pipeline, returning an eager summary DataFrame.
         """
-        return (  # type: ignore[return-value]
+        return (
             cls.load_data(data_folder)
             .pipe(cls.drop_records_without_postcode)
             .pipe(cls.drop_records_without_date)
@@ -50,8 +50,9 @@ class DataWrangler:
             .pipe(cls.rename_duration)
             .pipe(cls.rename_old_new)
             .pipe(cls.extract_postcode_area)
-            .pipe(cls.summarise_data)
-            .collect()
+            .pipe(cls.summarise_by_year_and_property_type)
+            .pipe(cls.sort_by_year_and_property_type)
+            .collect()  # type: ignore[union-attr]
         )
 
     @staticmethod
@@ -223,18 +224,30 @@ class DataWrangler:
         )
 
     @staticmethod
-    def summarise_data(df: FrameType) -> FrameType:
+    def sort_by_year_and_property_type(df: FrameType) -> FrameType:
         """
-        Summarises sales by year, property type, town/city and county, calculating
-        total number of unique sales and max, min and median price per group.
+        Sorts the frame ascending by year then property_type.
 
         Args:
-            df: Input frame with columns id, price, year, property_type, town_city, county.
+            df: Input frame with columns year and property_type.
         Returns:
-            Frame grouped by year, property_type, town_city, county with columns
+            Frame sorted by year ascending, then property_type ascending.
+        """
+        return df.sort(["year", "property_type"])
+
+    @staticmethod
+    def summarise_by_year_and_property_type(df: FrameType) -> FrameType:
+        """
+        Summarises sales by year and property type, calculating total number of
+        unique sales and max, min and median price per group.
+
+        Args:
+            df: Input frame with columns id, price, year, property_type.
+        Returns:
+            Frame grouped by year, property_type with columns
             total_sales, max_price, min_price, median_price.
         """
-        return df.group_by(["year", "property_type", "town_city", "county"]).agg(
+        return df.group_by(["year", "property_type"]).agg(
             pl.col("id").n_unique().alias("total_sales"),
             pl.col("price").max().alias("max_price"),
             pl.col("price").min().alias("min_price"),
