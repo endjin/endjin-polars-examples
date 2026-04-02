@@ -137,7 +137,7 @@ class DataWrangler:
             Frame with an additional column 'postcode_district'.
         """
         return df.with_columns(
-            pl.col("postcode").str.extract(r"^([A-Z]{1,2}\d{1,2})\s", 1).alias("postcode_district")
+            pl.col("postcode").str.extract(r"^([A-Z]{1,2}[0-9R][0-9A-Z]?)\s", 1).alias("postcode_district")
         )
 
     @staticmethod
