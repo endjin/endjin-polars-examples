@@ -2,7 +2,7 @@ from datetime import date
 
 from behave import given, when, then
 from common_steps import behave_table_to_polars_dataframe, compare_polars_dataframes
-from data_wrangler import build_date_dimension_table
+from data_wrangler import DataWrangler
 
 
 @given("the date dimension start date is '{start_date}' and the end date is '{end_date}'")
@@ -13,7 +13,7 @@ def step_given_date_range(context, start_date, end_date):
 
 @when('I build the date dimension')
 def step_when_build_date_dimension(context):
-    context.df = build_date_dimension_table(context.start_date, context.end_date)
+    context.df = DataWrangler.build_date_dimension_table(context.start_date, context.end_date)
 
 
 @then('the date dimension should include the following dates')
