@@ -1,7 +1,9 @@
 # Claude Code Assets
 CLAUDE.md
-skills/
+.claude/
+.devcontainer_new/
 
+# Ignore data files, which may contain sensitive information or be too large for version control.
 data/
 
 # Byte-compiled / optimized / DLL files
