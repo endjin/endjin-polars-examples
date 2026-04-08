@@ -1,7 +1,7 @@
 # Claude Code Assets
 CLAUDE.md
 .claude/
-.devcontainer_new/
+.devcontainer/
 
 # Ignore data files, which may contain sensitive information or be too large for version control.
 data/
