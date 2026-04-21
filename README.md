@@ -20,11 +20,13 @@ The `notebooks/sqlbits_2026/` folder contains two notebooks intended to be run i
 
 1. **`download_land_registry_data.ipynb`** — downloads up to 10 years of yearly price paid CSV files (~100 MB each) from the Land Registry S3 bucket into `data/land_registry_data/`. Already-downloaded files are skipped.
 
-2. **`summarise_land_registry_data.ipynb`** — runs the full `DataWrangler.run_pipeline()` against the downloaded data and plots median house price by year and property type using Plotly.
+2. **`summarise_land_registry_data.ipynb`** — runs the full `DataWrangler` pipeline against the downloaded data and plots median house price by year and property type using Plotly.
 
 ## DataWrangler pipeline
 
-`DataWrangler` in `src/data_wrangler/data_wrangler.py` exposes a `run_pipeline(data_folder)` class method that chains the following steps using Polars lazy execution (`scan_csv` → `collect`):
+`DataWrangler` in `src/data_wrangler/data_wrangler.py` supports both a backward-compatible `run_pipeline(data_folder)` class method and a data-source-driven API (`run_pipeline_with_data_source(...)`).
+
+Both paths chain the following steps using Polars lazy execution (`scan_csv` → `collect`):
 
 ```
 load_data                          scan_csv glob, name columns, cast price/date
@@ -45,17 +47,36 @@ All transformation methods are also callable individually as static methods, acc
 
 ## Getting started
 
-### Prerequisites
+You can run this project in two ways:
 
+### Option 1: Run locally
+
+Prerequisites:
+
+- [Python 3.12+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - [VS Code](https://code.visualstudio.com/) with the Python and Behave VSC extensions
 - `az login` if reading/writing to Azure storage (local runs use the filesystem)
 
-### Install dependencies
+Install dependencies:
 
 ```bash
 uv sync
 ```
+
+### Option 2: Run in a devcontainer
+
+Prerequisites:
+
+- [VS Code](https://code.visualstudio.com/)
+- Dev Containers extension (`ms-vscode-remote.remote-containers`)
+- Docker, or an equivalent Docker-compatible container runtime
+
+Notes:
+
+- You do not need to install `uv` on your host machine for this option.
+- Open the repository in VS Code and choose **Reopen in Container**.
+- The container provides the toolchain; run commands from inside the container terminal.
 
 ### Download Land Registry data
 
@@ -75,9 +96,13 @@ importer.download_land_registry_data()
 ### Run the pipeline
 
 ```python
-from data_wrangler import DataWrangler
+from data_wrangler import DataWrangler, LocalCsvDataSource
 
-summary = DataWrangler.run_pipeline("data/land_registry_data")
+data_source = LocalCsvDataSource(
+    data_folder="data/land_registry_data",
+    column_names=DataWrangler.COLUMN_NAMES,
+)
+summary = DataWrangler.run_pipeline_with_data_source(data_source)
 print(summary)
 ```
 
@@ -95,13 +120,3 @@ uv run behave                 # all tests
 
 Source: https://www.gov.uk/guidance/about-the-price-paid-data
 
-## Skills
-
-Task-specific how-to guides live in `skills/`. Read the relevant skill before working in each area:
-
-| Task | Skill |
-|---|---|
-| Writing or running BDD / Gherkin tests | `skills/executable-specifications/SKILL.md` |
-| Adding or structuring Python packages | `skills/python-package-management/SKILL.md` |
-| Writing Polars transformations | `skills/polars-best-practices/SKILL.md` |
-| Land Registry field definitions, schema, loading | `skills/land-registry-price-paid-data/SKILL.md` |

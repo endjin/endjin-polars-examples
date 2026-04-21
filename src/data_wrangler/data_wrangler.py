@@ -1,7 +1,39 @@
 import polars as pl
 from datetime import date
+from typing import Protocol, runtime_checkable
 
 FrameType = pl.DataFrame | pl.LazyFrame
+
+
+@runtime_checkable
+class PricePaidDataSource(Protocol):
+    """Abstraction for loading raw Price Paid data as a Polars lazy frame."""
+
+    def scan_price_paid(self) -> pl.LazyFrame:
+        """Return the raw dataset as a LazyFrame ready for transformation."""
+
+
+class LocalCsvDataSource:
+    """Loads Land Registry Price Paid CSV files from a local folder."""
+
+    def __init__(self, data_folder: str, column_names: list[str]) -> None:
+        self.data_folder = data_folder
+        self.column_names = column_names
+
+    def scan_price_paid(self) -> pl.LazyFrame:
+        return (
+            pl.scan_csv(
+                f"{self.data_folder}/pp-*.csv",
+                has_header=False,
+                new_columns=self.column_names,
+                infer_schema_length=0,
+                null_values=[""],
+            )
+            .with_columns(
+                pl.col("price").cast(pl.Int64),
+                pl.col("date").str.to_date(format="%Y-%m-%d %H:%M"),
+            )
+        )
 
 
 class DataWrangler:
@@ -13,45 +45,31 @@ class DataWrangler:
         "ppd_category", "record_type",
     ]
 
-    @staticmethod
-    def load_data(data_folder: str) -> pl.LazyFrame:
-        """
-        Scans all pp-*.csv files in data_folder as a lazy frame, naming columns
-        per the Land Registry positional schema and casting price/date to their
-        native types.
-        """
-        return (
-            pl.scan_csv(
-                f"{data_folder}/pp-*.csv",
-                has_header=False,
-                new_columns=DataWrangler.COLUMN_NAMES,
-                infer_schema_length=0,
-                null_values=[""],
-            )
-            .with_columns(
-                pl.col("price").cast(pl.Int64),
-                pl.col("date").str.to_date(format="%Y-%m-%d %H:%M"),
-            )
-        )
+    def __init__(self, data_source: PricePaidDataSource) -> None:
+        self.data_source = data_source
 
     @classmethod
-    def run_pipeline(cls, data_folder: str) -> pl.DataFrame:
+    def run_pipeline_with_data_source(cls, data_source: PricePaidDataSource) -> pl.DataFrame:
         """
-        Loads all CSVs from data_folder and runs the full transformation and
-        summarisation pipeline, returning an eager summary DataFrame.
+        Runs the full transformation and summarisation pipeline using an injected
+        data source.
         """
+        return cls(data_source).run()
+
+    def run(self) -> pl.DataFrame:
+        """Runs the full transformation pipeline against the configured data source."""
         return (
-            cls.load_data(data_folder)
-            .pipe(cls.drop_records_without_postcode)
-            .pipe(cls.drop_records_without_date)
-            .pipe(cls.filter_other_property_types)
-            .pipe(cls.extract_year_from_date)
-            .pipe(cls.rename_property_type)
-            .pipe(cls.rename_duration)
-            .pipe(cls.rename_old_new)
-            .pipe(cls.extract_postcode_area)
-            .pipe(cls.summarise_by_year_and_property_type)
-            .pipe(cls.sort_by_year_and_property_type)
+            self.data_source.scan_price_paid()
+            .pipe(self.drop_records_without_postcode)
+            .pipe(self.drop_records_without_date)
+            .pipe(self.filter_other_property_types)
+            .pipe(self.extract_year_from_date)
+            .pipe(self.rename_property_type)
+            .pipe(self.rename_duration)
+            .pipe(self.rename_old_new)
+            .pipe(self.extract_postcode_area)
+            .pipe(self.summarise_by_year_and_property_type)
+            .pipe(self.sort_by_year_and_property_type)
             .collect()  # type: ignore[union-attr]
         )
 

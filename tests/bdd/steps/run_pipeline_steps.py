@@ -1,6 +1,6 @@
 import os
 from behave import given, when, then
-from data_wrangler import DataWrangler
+from data_wrangler import DataWrangler, LocalCsvDataSource
 
 
 TEST_DATA_FOLDER = os.path.join(os.path.dirname(__file__), "..", "test_data")
@@ -15,7 +15,11 @@ def step_given_test_data_exists(context):
 
 @when('I run the pipeline')
 def step_when_run_pipeline(context):
-    context.result = DataWrangler.run_pipeline(context.test_data_folder)
+    data_source = LocalCsvDataSource(
+        data_folder=context.test_data_folder,
+        column_names=DataWrangler.COLUMN_NAMES,
+    )
+    context.result = DataWrangler.run_pipeline_with_data_source(data_source)
 
 
 @then('the result should be a non-empty summary DataFrame')
