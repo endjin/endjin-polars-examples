@@ -13,7 +13,7 @@ def step_given_date_range(context, start_date, end_date):
 
 @when('I build the date dimension')
 def step_when_build_date_dimension(context):
-    context.df = DataWrangler.build_date_dimension_table(context.start_date, context.end_date)
+    context.df = DataWrangler.build_date_dimension(context.start_date, context.end_date)
 
 
 @then('the date dimension should include the following dates')
