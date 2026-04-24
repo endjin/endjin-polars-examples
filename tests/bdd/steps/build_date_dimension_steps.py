@@ -16,7 +16,7 @@ def step_when_build_date_dimension(context):
     context.df = DataWrangler.build_date_dimension(context.start_date, context.end_date)
 
 
-@then('the date dimension should include the following dates')
+@then('the date dimension should include the following months')
 def step_then_date_dimension(context):
     expected = behave_table_to_polars_dataframe(context.table)
     compare_polars_dataframes(expected, context.df)

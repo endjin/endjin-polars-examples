@@ -80,12 +80,13 @@ def test_project_to_gold() -> None:
     assert "dim_location" in data_source.written_tables
     assert "fact_price_paid" in data_source.written_tables
 
-    # Verify dim_date has expected columns
+    # Verify dim_date has expected columns (monthly granularity)
     dim_date = data_source.written_tables["dim_date"]
-    assert "date" in dim_date.columns
+    assert "year_month" in dim_date.columns
     assert "year" in dim_date.columns
+    assert "quarter" in dim_date.columns
+    assert "month" in dim_date.columns
     assert "month_name" in dim_date.columns
-    assert "day_name" in dim_date.columns
 
     # Verify dim_location has expected columns
     dim_location = data_source.written_tables["dim_location"]
@@ -94,12 +95,15 @@ def test_project_to_gold() -> None:
     assert "district" in dim_location.columns
     assert "postcode_area" in dim_location.columns
 
-    # Verify fact_price_paid has expected columns
+    # Verify fact_price_paid has expected columns (aggregated)
     fact = data_source.written_tables["fact_price_paid"]
     assert "location_id" in fact.columns
-    assert "price" in fact.columns
-    assert "date_of_transfer" in fact.columns
-    assert "postcode_area" in fact.columns
+    assert "year_month" in fact.columns
+    assert "property_type" in fact.columns
+    assert "min_price" in fact.columns
+    assert "median_price" in fact.columns
+    assert "max_price" in fact.columns
+    assert "transaction_count" in fact.columns
 
     # Verify all tables written to gold schema
     assert data_source.written_schemas["dim_date"] == "gold"

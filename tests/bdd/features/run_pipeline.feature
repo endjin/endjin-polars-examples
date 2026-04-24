@@ -17,6 +17,6 @@ Feature: Run data wrangler pipeline end-to-end
     Then the dim_date table should be non-empty
     And the dim_location table should be non-empty
     And the fact_price_paid table should be non-empty
-    And dim_date should contain the columns date, year, month, month_name, day_name, is_weekend
-    And dim_location should contain the columns county, district, town_city, postcode_area
-    And fact_price_paid should contain the columns price, date_of_transfer, postcode, property_type
+    And dim_date should contain the columns year_month, year, quarter, month, month_name
+    And dim_location should contain the columns location_id, county, district, town_city, postcode_area
+    And fact_price_paid should contain the columns year_month, location_id, property_type, min_price, median_price, max_price, transaction_count

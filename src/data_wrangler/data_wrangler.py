@@ -379,33 +379,33 @@ class DataWrangler:
     @staticmethod
     def build_date_dimension(min_date: date, max_date: date) -> pl.DataFrame:
         """
-        Builds a date dimension table for the inclusive range [min_date, max_date].
+        Builds a monthly date dimension table for the inclusive range [min_date, max_date].
 
         Args:
             min_date: First date in the range.
             max_date: Last date in the range (inclusive).
 
         Returns:
-            DataFrame with columns: date, year, month, month_name, day, weekday,
-            day_name, day_of_year, is_weekend, is_leap_year.
+            DataFrame with columns: year_month, year, quarter, month, month_name.
         """
         logger.info("  → Building date dimension...")
+        # Generate monthly range using first of each month
+        start_month = date(min_date.year, min_date.month, 1)
+        end_month = date(max_date.year, max_date.month, 1)
+        
         result = (
-            pl.date_range(start=min_date, end=max_date, interval="1d", eager=True)
+            pl.date_range(start=start_month, end=end_month, interval="1mo", eager=True)
             .to_frame(name="date")
             .with_columns(
+                pl.col("date").dt.strftime("%Y-%m").alias("year_month"),
                 pl.col("date").dt.year().alias("year"),
+                pl.col("date").dt.quarter().alias("quarter"),
                 pl.col("date").dt.month().alias("month"),
                 pl.col("date").dt.strftime("%B").alias("month_name"),
-                pl.col("date").dt.day().alias("day"),
-                pl.col("date").dt.weekday().alias("weekday"),
-                pl.col("date").dt.strftime("%A").alias("day_name"),
-                pl.col("date").dt.ordinal_day().alias("day_of_year"),
-                (pl.col("date").dt.weekday() >= 6).alias("is_weekend"),
-                pl.col("date").dt.is_leap_year().alias("is_leap_year"),
             )
+            .drop("date")
         )
-        logger.info(f"    Date range: {min_date} to {max_date} ({len(result):,} days)")
+        logger.info(f"    Date range: {start_month} to {end_month} ({len(result):,} months)")
         return result
 
     @staticmethod
@@ -433,7 +433,10 @@ class DataWrangler:
     @staticmethod
     def build_price_paid_fact(df: pl.DataFrame, dim_location: pl.DataFrame | None = None) -> pl.DataFrame:
         """
-        Builds the price paid fact table with foreign keys to dimensions.
+        Builds the aggregated price paid fact table with foreign keys to dimensions.
+
+        Aggregates transactions by year_month, location, property_type, and old_new,
+        calculating min, median, and max price for each group.
 
         Args:
             df: Full silver layer DataFrame.
@@ -441,36 +444,51 @@ class DataWrangler:
                          If provided, joins to add location_id foreign key.
 
         Returns:
-            DataFrame with core transaction columns suitable for a fact table.
+            DataFrame with aggregated price metrics per month/location/property_type/old_new.
         """
         logger.info("  → Building fact table...")
         
-        # Base columns for the fact table
-        base_columns = [
-            "price",
-            pl.col("date").alias("date_of_transfer"),  # FK to dim_date
-            "postcode",
-            "postcode_area",
-            "town_city",
-            "property_type",
-            "old_new",
-        ]
+        # Add year_month column for aggregation
+        df_with_month = df.with_columns(
+            pl.col("date").dt.strftime("%Y-%m").alias("year_month")
+        )
         
         if dim_location is not None:
             # Join with location dimension to get location_id
             join_keys = ["county", "district", "town_city", "postcode_area"]
+            df_with_location = df_with_month.join(
+                dim_location.select(["location_id"] + join_keys),
+                on=join_keys,
+                how="left",
+            )
+            
+            # Aggregate by year_month, location_id, property_type, old_new
             result = (
-                df.join(
-                    dim_location.select(["location_id"] + join_keys),
-                    on=join_keys,
-                    how="left",
+                df_with_location
+                .group_by(["year_month", "location_id", "property_type", "old_new"])
+                .agg(
+                    pl.col("price").min().alias("min_price"),
+                    pl.col("price").median().alias("median_price"),
+                    pl.col("price").max().alias("max_price"),
+                    pl.col("price").count().alias("transaction_count"),
                 )
-                .select(["location_id"] + base_columns)
+                .sort(["year_month", "location_id", "property_type", "old_new"])
             )
         else:
-            result = df.select(base_columns)
+            # No location dimension - aggregate without location_id
+            result = (
+                df_with_month
+                .group_by(["year_month", "property_type", "old_new"])
+                .agg(
+                    pl.col("price").min().alias("min_price"),
+                    pl.col("price").median().alias("median_price"),
+                    pl.col("price").max().alias("max_price"),
+                    pl.col("price").count().alias("transaction_count"),
+                )
+                .sort(["year_month", "property_type", "old_new"])
+            )
         
-        logger.info(f"    {len(result):,} fact records")
+        logger.info(f"    {len(result):,} aggregated fact records")
         return result
 
     @staticmethod

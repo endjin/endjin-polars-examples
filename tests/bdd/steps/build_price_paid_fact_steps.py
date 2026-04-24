@@ -16,6 +16,13 @@ def step_when_build_fact(context):
     context.result = DataWrangler.build_price_paid_fact(context.df)
 
 
+@when('I build the price paid fact table with location dimension')
+def step_when_build_fact_with_dimension(context):
+    dim_location = DataWrangler.build_location_dimension(context.df)
+    context.dim_location = dim_location
+    context.result = DataWrangler.build_price_paid_fact(context.df, dim_location)
+
+
 @then('the fact table should contain {count:d} rows')
 def step_then_fact_row_count(context, count):
     assert len(context.result) == count, f"Expected {count} rows, got {len(context.result)}"
@@ -37,40 +44,15 @@ def step_then_fact_not_has_columns(context, columns):
     assert not present, f"Unexpected columns present: {present}"
 
 
-@then('the date_of_transfer column should contain "{date_str}"')
-def step_then_date_of_transfer(context, date_str):
-    expected_date = date.fromisoformat(date_str)
-    actual_date = context.result["date_of_transfer"][0]
-    assert actual_date == expected_date, f"Expected {expected_date}, got {actual_date}"
-
-
-@when('I build the price paid fact table with location dimension')
-def step_when_build_fact_with_dimension(context):
-    dim_location = DataWrangler.build_location_dimension(context.df)
-    context.dim_location = dim_location
-    context.result = DataWrangler.build_price_paid_fact(context.df, dim_location)
-
-
 @then('the fact table should have a column "{column}"')
 def step_then_fact_has_column(context, column):
     assert column in context.result.columns, f"Expected column '{column}' not found. Columns: {context.result.columns}"
 
 
-@then('transactions in the same location should have the same location_id')
-def step_then_same_location_same_id(context):
-    # Group by location columns and check location_id is consistent
-    grouped = context.result.group_by(["postcode_area", "town_city"]).agg(
-        pl.col("location_id").n_unique().alias("unique_ids")
-    )
-    max_unique = grouped["unique_ids"].max()
-    assert max_unique == 1, "Transactions in the same location have different location_ids"
-
-
-@then('transactions in different locations should have different location_ids')
-def step_then_different_locations_different_ids(context):
-    # Get unique location_ids per location combination
-    unique_locations = context.result.select(["postcode_area", "town_city", "location_id"]).unique()
-    # Should have same number of rows as unique location_ids
-    n_locations = len(unique_locations)
-    n_unique_ids = unique_locations["location_id"].n_unique()
-    assert n_locations == n_unique_ids, f"Expected {n_locations} unique location_ids, got {n_unique_ids}"
+@then('the aggregated row should have min_price {min_price:d}, median_price {median_price:d}, max_price {max_price:d}, transaction_count {count:d}')
+def step_then_aggregated_prices(context, min_price, median_price, max_price, count):
+    row = context.result.row(0, named=True)
+    assert row["min_price"] == min_price, f"Expected min_price {min_price}, got {row['min_price']}"
+    assert row["median_price"] == float(median_price), f"Expected median_price {median_price}, got {row['median_price']}"
+    assert row["max_price"] == max_price, f"Expected max_price {max_price}, got {row['max_price']}"
+    assert row["transaction_count"] == count, f"Expected transaction_count {count}, got {row['transaction_count']}"
