@@ -359,8 +359,8 @@ class DataWrangler:
         # Build location dimension
         dim_location = self.build_location_dimension(silver_data)
 
-        # Build fact table
-        fact_price_paid = self.build_price_paid_fact(silver_data)
+        # Build fact table with location foreign key
+        fact_price_paid = self.build_price_paid_fact(silver_data, dim_location)
 
         # Write all tables to gold schema
         logger.info(f"Writing dim_date to {gold_schema}.dim_date...")
@@ -417,38 +417,59 @@ class DataWrangler:
             df: DataFrame containing county, district, town_city, postcode_area columns.
 
         Returns:
-            DataFrame with unique location combinations.
+            DataFrame with unique location combinations and a surrogate key (location_id).
         """
         logger.info("  → Building location dimension...")
         result = (
             df.select(["county", "district", "town_city", "postcode_area"])
             .unique()
             .sort(["county", "district", "town_city", "postcode_area"])
+            .with_row_index(name="location_id", offset=1)
+            .select(["location_id", "county", "district", "town_city", "postcode_area"])
         )
         logger.info(f"    {len(result):,} unique locations")
         return result
 
     @staticmethod
-    def build_price_paid_fact(df: pl.DataFrame) -> pl.DataFrame:
+    def build_price_paid_fact(df: pl.DataFrame, dim_location: pl.DataFrame | None = None) -> pl.DataFrame:
         """
         Builds the price paid fact table with foreign keys to dimensions.
 
         Args:
             df: Full silver layer DataFrame.
+            dim_location: Optional location dimension DataFrame with location_id.
+                         If provided, joins to add location_id foreign key.
 
         Returns:
             DataFrame with core transaction columns suitable for a fact table.
         """
         logger.info("  → Building fact table...")
-        result = df.select([
+        
+        # Base columns for the fact table
+        base_columns = [
             "price",
             pl.col("date").alias("date_of_transfer"),  # FK to dim_date
             "postcode",
-            "postcode_area",  # FK to dim_location
-            "town_city",  # FK to dim_location
+            "postcode_area",
+            "town_city",
             "property_type",
             "old_new",
-        ])
+        ]
+        
+        if dim_location is not None:
+            # Join with location dimension to get location_id
+            join_keys = ["county", "district", "town_city", "postcode_area"]
+            result = (
+                df.join(
+                    dim_location.select(["location_id"] + join_keys),
+                    on=join_keys,
+                    how="left",
+                )
+                .select(["location_id"] + base_columns)
+            )
+        else:
+            result = df.select(base_columns)
+        
         logger.info(f"    {len(result):,} fact records")
         return result
 

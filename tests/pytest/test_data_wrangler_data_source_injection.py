@@ -89,12 +89,14 @@ def test_project_to_gold() -> None:
 
     # Verify dim_location has expected columns
     dim_location = data_source.written_tables["dim_location"]
+    assert "location_id" in dim_location.columns
     assert "county" in dim_location.columns
     assert "district" in dim_location.columns
     assert "postcode_area" in dim_location.columns
 
     # Verify fact_price_paid has expected columns
     fact = data_source.written_tables["fact_price_paid"]
+    assert "location_id" in fact.columns
     assert "price" in fact.columns
     assert "date_of_transfer" in fact.columns
     assert "postcode_area" in fact.columns

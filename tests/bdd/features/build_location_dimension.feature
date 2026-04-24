@@ -25,3 +25,14 @@ Feature: Build a location dimension
     When I build the location dimension
     Then the first location should be in county "AVON"
     And the last location should be in county "WEST YORKSHIRE"
+
+  Scenario: Location dimension has surrogate key
+    Given the following price paid data exists
+      | county:string       | district:string     | town_city:string | postcode_area:string |
+      | GREATER LONDON      | WESTMINSTER         | LONDON           | SW1A                 |
+      | GREATER MANCHESTER  | MANCHESTER          | MANCHESTER       | M1                   |
+      | AVON                | BRISTOL             | BRISTOL          | BS1                  |
+    When I build the location dimension
+    Then the location dimension should have a column "location_id"
+    And the location_id values should be unique
+    And the location_id values should start from 1

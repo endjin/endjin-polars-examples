@@ -17,3 +17,14 @@ Feature: Build a price paid fact table
       | 1         | 250000        | 2024-03-10 | BS1 5AH         | BS1                  | Terraced             | Old            | Freehold        | AVON           | BRISTOL         | BRISTOL          |
     When I build the price paid fact table
     Then the date_of_transfer column should contain "2024-03-10"
+
+  Scenario: Fact table has location_id foreign key from dimension join
+    Given the following silver layer data exists
+      | id:string | price:integer | date:date  | postcode:string | postcode_area:string | property_type:string | old_new:string | duration:string | county:string      | district:string | town_city:string |
+      | 1         | 250000        | 2024-01-15 | SW1A 2AA        | SW1A                 | Detached             | Old            | Freehold        | GREATER LONDON     | WESTMINSTER     | LONDON           |
+      | 2         | 300000        | 2024-02-20 | SW1A 1AA        | SW1A                 | Flat                 | New            | Leasehold       | GREATER LONDON     | WESTMINSTER     | LONDON           |
+      | 3         | 175000        | 2024-03-10 | M1 1AE          | M1                   | Terraced             | Old            | Freehold        | GREATER MANCHESTER | MANCHESTER      | MANCHESTER       |
+    When I build the price paid fact table with location dimension
+    Then the fact table should have a column "location_id"
+    And transactions in the same location should have the same location_id
+    And transactions in different locations should have different location_ids
