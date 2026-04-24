@@ -4,6 +4,7 @@ CLAUDE.md
 
 # Ignore data files, which may contain sensitive information or be too large for version control.
 data/
+tests/bdd/test_output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

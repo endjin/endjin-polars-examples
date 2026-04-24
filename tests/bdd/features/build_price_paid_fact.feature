@@ -8,8 +8,8 @@ Feature: Build a price paid fact table
       | 2         | 300000        | 2024-02-20 | M1 1AE          | M1                   | Flat                 | New            | Leasehold       | GREATER MANCHESTER | MANCHESTER  | MANCHESTER       |
     When I build the price paid fact table
     Then the fact table should contain 2 rows
-    And the fact table should have columns price, date_of_transfer, postcode, postcode_area, property_type, old_new
-    And the fact table should not have columns id, duration, county, district, town_city
+    And the fact table should have columns price, date_of_transfer, postcode, postcode_area, town_city, property_type, old_new
+    And the fact table should not have columns id, duration, county, district
 
   Scenario: Fact table renames date column to date_of_transfer
     Given the following silver layer data exists

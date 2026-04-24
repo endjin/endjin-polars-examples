@@ -39,61 +39,62 @@ class FakePricePaidDataSource:
         self.written_schemas[table] = schema
         self.written_modes[table] = mode
 
+    def scan_table(self, schema: str, table: str) -> pl.LazyFrame:
+        """Return the written table as a LazyFrame for reading."""
+        return self.written_tables[table].lazy()
+
 
 def test_process_to_silver() -> None:
     """Test that process_to_silver produces full-fidelity cleaned data."""
     data_source = FakePricePaidDataSource()
-    result = DataWrangler.run_pipeline_with_data_source(data_source)
+    DataWrangler.run_pipeline_with_data_source(data_source)
+
+    # Inspect the silver table that was written
+    silver_data = data_source.written_tables["price_paid_data"]
 
     # Should have 2 rows (O/Other is filtered out)
-    assert len(result) == 2
+    assert len(silver_data) == 2
 
     # Should have renamed property types
-    assert set(result["property_type"].to_list()) == {"Detached", "Semi-Detached"}
+    assert set(silver_data["property_type"].to_list()) == {"Detached", "Semi-Detached"}
 
     # Should have year extracted
-    assert "year" in result.columns
-    assert result["year"].to_list() == [2024, 2024]
+    assert "year" in silver_data.columns
+    assert silver_data["year"].to_list() == [2024, 2024]
 
     # Should have postcode_area extracted
-    assert "postcode_area" in result.columns
+    assert "postcode_area" in silver_data.columns
 
     # Verify write was called with correct parameters
     assert data_source.written_schemas["price_paid_data"] == "silver"
     assert data_source.written_modes["price_paid_data"] == "overwrite"
 
 
-def test_process_to_gold() -> None:
-    """Test that process_to_gold creates dimensional model."""
+def test_project_to_gold() -> None:
+    """Test that project_to_gold creates dimensional model from silver table."""
     data_source = FakePricePaidDataSource()
-    wrangler = DataWrangler(data_source)
+    DataWrangler.run_pipeline_with_data_source(data_source)
 
-    # First process to silver
-    silver_data = wrangler.process_to_silver()
-
-    # Then process to gold
-    gold_tables = wrangler.process_to_gold(silver_data)
-
-    # Verify all three tables are created
-    assert "dim_date" in gold_tables
-    assert "dim_location" in gold_tables
-    assert "fact_price_paid" in gold_tables
+    # Verify all three gold tables were written
+    assert "dim_date" in data_source.written_tables
+    assert "dim_location" in data_source.written_tables
+    assert "fact_price_paid" in data_source.written_tables
 
     # Verify dim_date has expected columns
-    dim_date = gold_tables["dim_date"]
+    dim_date = data_source.written_tables["dim_date"]
     assert "date" in dim_date.columns
     assert "year" in dim_date.columns
     assert "month_name" in dim_date.columns
     assert "day_name" in dim_date.columns
 
     # Verify dim_location has expected columns
-    dim_location = gold_tables["dim_location"]
+    dim_location = data_source.written_tables["dim_location"]
     assert "county" in dim_location.columns
     assert "district" in dim_location.columns
     assert "postcode_area" in dim_location.columns
 
     # Verify fact_price_paid has expected columns
-    fact = gold_tables["fact_price_paid"]
+    fact = data_source.written_tables["fact_price_paid"]
     assert "price" in fact.columns
     assert "date_of_transfer" in fact.columns
     assert "postcode_area" in fact.columns
