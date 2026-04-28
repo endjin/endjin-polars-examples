@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Orchestrate End to End Process"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "7878d7af-7fee-a5c4-49bb-a05d07ecc377"
+  }
+}

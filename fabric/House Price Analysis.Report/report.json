@@ -1,0 +1,60 @@
+{
+  "config": "{\"version\":\"5.72\",\"themeCollection\":{\"baseTheme\":{\"name\":\"CY26SU04\",\"type\":2,\"version\":{\"visual\":\"2.8.0\",\"report\":\"3.2.0\",\"page\":\"2.3.1\"}}},\"activeSectionIndex\":0,\"defaultDrillFilterOtherVisuals\":true,\"linguisticSchemaSyncVersion\":0,\"settings\":{\"useNewFilterPaneExperience\":true,\"allowChangeFilterTypes\":true,\"useStylableVisualContainerHeader\":true,\"queryLimitOption\":6,\"useEnhancedTooltips\":true,\"exportDataMode\":1,\"useDefaultAggregateDisplayName\":true},\"objects\":{\"section\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"'Top'\"}}}}}]}}",
+  "layoutOptimization": 0,
+  "resourcePackages": [
+    {
+      "resourcePackage": {
+        "disabled": false,
+        "items": [
+          {
+            "name": "CY26SU04",
+            "path": "BaseThemes/CY26SU04.json",
+            "type": 202
+          }
+        ],
+        "name": "SharedResources",
+        "type": 2
+      }
+    }
+  ],
+  "sections": [
+    {
+      "config": "{}",
+      "displayName": "Page 1",
+      "displayOption": 1,
+      "filters": "[]",
+      "height": 720.00,
+      "name": "d660fe60b0b712b77b47",
+      "visualContainers": [
+        {
+          "config": "{\"name\":\"b10d26ee2a4346c02c59\",\"layouts\":[{\"id\":0,\"position\":{\"x\":331.3097713097713,\"y\":171.64241164241164,\"z\":0,\"width\":908.7733887733888,\"height\":510.9355509355509,\"tabOrder\":0}}],\"singleVisual\":{\"visualType\":\"lineChart\",\"projections\":{\"Category\":[{\"queryRef\":\"dim_date.year\",\"active\":true},{\"queryRef\":\"dim_date.quarter\"},{\"queryRef\":\"dim_date.month\"}],\"Y\":[{\"queryRef\":\"fact_price_paid.Median Price\"}],\"Series\":[{\"queryRef\":\"fact_price_paid.property_type\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"d\",\"Entity\":\"dim_date\",\"Type\":0},{\"Name\":\"f\",\"Entity\":\"fact_price_paid\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"year\"},\"Name\":\"dim_date.year\",\"NativeReferenceName\":\"year\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"quarter\"},\"Name\":\"dim_date.quarter\",\"NativeReferenceName\":\"quarter\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"f\"}},\"Property\":\"Median Price\"},\"Name\":\"fact_price_paid.Median Price\",\"NativeReferenceName\":\"Median Price\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"f\"}},\"Property\":\"property_type\"},\"Name\":\"fact_price_paid.property_type\",\"NativeReferenceName\":\"property_type\"},{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"month\"},\"Name\":\"dim_date.month\",\"NativeReferenceName\":\"month\"}],\"OrderBy\":[{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"year\"}}},{\"Direction\":1,\"Expression\":{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"quarter\"}}}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"categoryAxis\":[{\"properties\":{\"concatenateLabels\":{\"expr\":{\"Literal\":{\"Value\":\"false\"}}}}}]}}}",
+          "filters": "[]",
+          "height": 510.94,
+          "width": 908.77,
+          "x": 331.31,
+          "y": 171.64,
+          "z": 0.00
+        },
+        {
+          "config": "{\"name\":\"b3d8de9200a51c00d169\",\"layouts\":[{\"id\":0,\"position\":{\"x\":331.3097713097713,\"y\":39.91683991683992,\"z\":2000,\"width\":908.7733887733888,\"height\":111.76715176715176,\"tabOrder\":2000}}],\"singleVisual\":{\"visualType\":\"cardVisual\",\"projections\":{\"Data\":[{\"queryRef\":\"fact_price_paid.Max Price\"},{\"queryRef\":\"fact_price_paid.Count of Properties Sold\"}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"f\",\"Entity\":\"fact_price_paid\",\"Type\":0}],\"Select\":[{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"f\"}},\"Property\":\"Max Price\"},\"Name\":\"fact_price_paid.Max Price\",\"NativeReferenceName\":\"Max Price\"},{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"f\"}},\"Property\":\"Count of Properties Sold\"},\"Name\":\"fact_price_paid.Count of Properties Sold\",\"NativeReferenceName\":\"Count of Properties Sold\"}],\"OrderBy\":[{\"Direction\":2,\"Expression\":{\"Measure\":{\"Expression\":{\"SourceRef\":{\"Source\":\"f\"}},\"Property\":\"Max Price\"}}}]},\"drillFilterOtherVisuals\":true,\"hasDefaultSort\":true}}",
+          "filters": "[]",
+          "height": 111.77,
+          "width": 908.77,
+          "x": 331.31,
+          "y": 39.92,
+          "z": 2000.00
+        },
+        {
+          "config": "{\"name\":\"c70d9b09412e12eae108\",\"layouts\":[{\"id\":0,\"position\":{\"x\":0,\"y\":39.91683991683992,\"z\":1000,\"width\":296.7151767151767,\"height\":642.6611226611226,\"tabOrder\":1000}}],\"singleVisual\":{\"visualType\":\"slicer\",\"projections\":{\"Values\":[{\"queryRef\":\"dim_location.county\",\"active\":true}]},\"prototypeQuery\":{\"Version\":2,\"From\":[{\"Name\":\"d\",\"Entity\":\"dim_location\",\"Type\":0}],\"Select\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"county\"},\"Name\":\"dim_location.county\",\"NativeReferenceName\":\"county\"}]},\"drillFilterOtherVisuals\":true,\"objects\":{\"data\":[{\"properties\":{\"mode\":{\"expr\":{\"Literal\":{\"Value\":\"'Basic'\"}}}}}],\"general\":[{\"properties\":{\"filter\":{\"filter\":{\"Version\":2,\"From\":[{\"Name\":\"d\",\"Entity\":\"dim_location\",\"Type\":0}],\"Where\":[{\"Condition\":{\"In\":{\"Expressions\":[{\"Column\":{\"Expression\":{\"SourceRef\":{\"Source\":\"d\"}},\"Property\":\"county\"}}],\"Values\":[[{\"Literal\":{\"Value\":\"'CITY OF BRISTOL'\"}}]]}}}]}}}}]}}}",
+          "filters": "[]",
+          "height": 642.66,
+          "width": 296.72,
+          "x": 0.00,
+          "y": 39.92,
+          "z": 1000.00
+        }
+      ],
+      "width": 1280.00
+    }
+  ]
+}

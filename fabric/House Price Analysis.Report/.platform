@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "House Price Analysis"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4fbd1e27-da11-b41f-4802-4f144ad2b0c0"
+  }
+}
