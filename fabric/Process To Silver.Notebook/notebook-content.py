@@ -14,7 +14,7 @@
 
 import logging
 
-from builtin.data_wrangler.data_wrangler import DataWrangler, OneLakeFabricDataSource
+from builtin.internal_classes.data_wrangler import DataWrangler, OneLakeFabricDataSource
 
 # METADATA ********************
 
