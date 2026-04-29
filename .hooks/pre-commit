@@ -1,0 +1,2 @@
+#!/bin/sh
+pwsh -File "$(git rev-parse --show-toplevel)/.hooks/pre-commit.ps1"

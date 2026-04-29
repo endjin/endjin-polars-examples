@@ -24,6 +24,8 @@ dev = [
     "pandas",
     "behave",
     "pytest",
+    "black",
+    "flake8"
 ]
 
 [build-system]
