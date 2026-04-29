@@ -10,6 +10,11 @@ $env:PATH = "$HOME/.local/bin:$env:PATH"
 
 # Sync Python dependencies
 Write-Host "Syncing Python dependencies..."
-uv sync
+uv sync --extra dev
+
+# Configure git to use the version-controlled hooks directory
+Write-Host "Configuring git hooks..."
+git config core.hooksPath .hooks
+chmod +x .hooks/pre-commit
 
 Write-Host "Post-create setup complete!"

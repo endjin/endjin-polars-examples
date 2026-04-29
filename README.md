@@ -6,6 +6,7 @@ Practical examples of [Polars](https://www.pola.rs/) in use for modern, cloud-na
 
 | Folder | Description |
 |---|---|
+| `.hooks` | Git hook scripts (NOTE: Will be setup automatically when using the Devcontainer) |
 | `notebooks/sqlbits_2026/` | Demo notebooks for the **SQLbits 2026** conference — download Land Registry data and run the full wrangling pipeline |
 | `notebooks/polars_blog/` | Polars blog post series covering eager/lazy patterns, Polars vs pandas, and Microsoft Fabric |
 | `src/data_wrangler/` | `DataWrangler` class — transformation pipeline and Pandera schema |
