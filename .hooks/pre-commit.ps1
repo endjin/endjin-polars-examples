@@ -5,6 +5,16 @@ $ErrorActionPreference = "Stop"
 $repoRoot = git rev-parse --show-toplevel
 Set-Location $repoRoot
 
+$fabricNotebookResourceScripts = @(
+    @{
+        script = 'src/data_wrangler/data_wrangler.py'
+        notebooks = @(
+            'fabric/Process To Silver.Notebook'
+            'fabric/Project to Gold.Notebook'
+        )
+    }
+)
+
 $failed = $false
 
 # Write-Host "==> black: checking formatting..." -ForegroundColor Cyan
@@ -32,6 +42,38 @@ Write-Host "==> behave: running BDD tests..." -ForegroundColor Cyan
 uv run behave tests/bdd/
 if ($LASTEXITCODE -ne 0) {
     Write-Host "FAILED: behave tests did not pass." -ForegroundColor Red
+    $failed = $true
+}
+
+# Ensure the fabric notebook resources are updated
+Write-Host '==> Syncing Fabric Notebook Resources...' -ForegroundColor Cyan
+try {
+    foreach ($resource in $fabricNotebookResourceScripts) {
+        $srcFile = Join-Path $repoRoot $resource.script
+        foreach ($notebook in $resource.notebooks) {
+            $destNotebookDir = Join-Path $repoRoot $notebook
+            $destDir = Join-Path $destNotebookDir 'Resources/builtin/internal_classes'
+            $destFile = Join-Path $destDir (Split-Path $srcFile -Leaf)
+    
+            $copied = $false
+            if (-not (Test-Path $destFile)) {
+                Copy-Item -Force $srcFile $destFile
+                $copied = $true
+            } elseif ((Get-FileHash $srcFile).Hash -ne (Get-FileHash $destFile).Hash) {
+                Copy-Item -Force $srcFile $destFile
+                $copied = $true
+            }
+    
+            if ($copied) {
+                Write-Host "==> Updated notebook resource: $destFile" -ForegroundColor Cyan
+                git add "$destFile"
+            }
+        }
+    }
+    Write-Host 'Complete.' -f Green
+}
+catch {
+    Write-Host "FAILED: Error whilst syncing Fabric Notebook Resources - $($_.Exception.Message)" -ForegroundColor Red
     $failed = $true
 }
 
