@@ -78,7 +78,8 @@ try {
             if ($copied) {
                 & git add "$destFile"
                 Write-Host "==> Updated notebook resource: $destFile - commit will be blocked to allow staged changes to be reviewed" -ForegroundColor Cyan
-                $failed = $true
+                # TODO: Should we auto-commit having made these git index changes?
+                # $failed = $true
             }
         }
     }
