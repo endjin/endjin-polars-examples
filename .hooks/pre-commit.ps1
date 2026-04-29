@@ -56,17 +56,29 @@ try {
             $destFile = Join-Path $destDir (Split-Path $srcFile -Leaf)
     
             $copied = $false
-            if (-not (Test-Path $destFile)) {
-                Copy-Item -Force $srcFile $destFile
-                $copied = $true
-            } elseif ((Get-FileHash $srcFile).Hash -ne (Get-FileHash $destFile).Hash) {
-                Copy-Item -Force $srcFile $destFile
-                $copied = $true
+            $tempFile = New-TemporaryFile
+            try {
+                # Ensure that the synced files are consistent with either the current
+                # committed version or a staged version (i.e. to include cny changes
+                # that will be committed if this hook is successful).
+                $stagedPath = $resource.script -replace '\\', '/'
+                $stagedContent = & git show ":$stagedPath" 2>$null
+                if ($LASTEXITCODE -eq 0) {
+                    $stagedContent | Out-File -FilePath $tempFile.FullName -Encoding utf8NoBOM
+                    if (-not (Test-Path $destFile) -or (Get-FileHash $tempFile.FullName).Hash -ne (Get-FileHash $destFile).Hash) {
+                        Copy-Item -Force $tempFile.FullName $destFile
+                        $copied = $true
+                    }
+                }
+            }
+            finally {
+                Remove-Item $tempFile.FullName -ErrorAction SilentlyContinue
             }
     
             if ($copied) {
-                Write-Host "==> Updated notebook resource: $destFile" -ForegroundColor Cyan
-                git add "$destFile"
+                & git add "$destFile"
+                Write-Host "==> Updated notebook resource: $destFile - commit will be blocked to allow staged changes to be reviewed" -ForegroundColor Cyan
+                $failed = $true
             }
         }
     }
