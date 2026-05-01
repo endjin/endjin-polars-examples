@@ -539,21 +539,6 @@ class DataWrangler:
         )
 
     @staticmethod
-    def extract_postcode_district(df: FrameType) -> FrameType:
-        """
-        Extracts the postcode district from the 'postcode' column and adds it as a
-        new column 'postcode_district' (e.g. 'SW1' from 'SW1A 2AA').
-
-        Args:
-            df: Input frame with a column named 'postcode' of type String.
-        Returns:
-            Frame with an additional column 'postcode_district'.
-        """
-        return df.with_columns(
-            pl.col("postcode").str.extract(r"^([A-Z]{1,2}[0-9R][0-9A-Z]?)\s", 1).alias("postcode_district")
-        )
-
-    @staticmethod
     def drop_records_without_postcode(df: FrameType) -> FrameType:
         """
         Drops records where the 'postcode' column is null or empty.

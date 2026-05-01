@@ -1,0 +1,14 @@
+{
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "1.2.9",
+      "resolved": "ghcr.io/devcontainers/features/azure-cli@sha256:4549175fbfd3475d1d62e82f6e5425d03954a6ae06027b2515b0ba41a8206417",
+      "integrity": "sha256:4549175fbfd3475d1d62e82f6e5425d03954a6ae06027b2515b0ba41a8206417"
+    },
+    "ghcr.io/devcontainers/features/powershell:2.0.1": {
+      "version": "2.0.1",
+      "resolved": "ghcr.io/devcontainers/features/powershell@sha256:2db157a4f97465bb64e03596e0f795e9899e3c041b64a7a0ffd8faea4fc50c39",
+      "integrity": "sha256:2db157a4f97465bb64e03596e0f795e9899e3c041b64a7a0ffd8faea4fc50c39"
+    }
+  }
+}
