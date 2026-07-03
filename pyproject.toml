@@ -7,24 +7,30 @@ requires-python = ">=3.12,<3.14"
 dependencies = [
     "polars",
     "requests",
-    "arrow",
-    "ipykernel",
     "pyarrow",
+    "fsspec",
+    "deltalake",
+    "pandera[polars]",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipykernel",
     "plotly[express]",
     "nbformat",
-    "azure-storage-file-datalake",
-    "azure-identity",
-    "wbgapi",
+    "nbconvert",
     "xlsxwriter",
     "duckdb",
     "pandas",
-    "nbconvert",
-    "fsspec>=2026.1.0",
-    "deltalake>=1.3.2",
+    "behave",
+    "pytest",
+    "black",
+    "flake8"
 ]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/data_importers"]
+packages = ["src/data_importers", "src/data_wrangler"]

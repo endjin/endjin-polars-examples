@@ -1,0 +1,8 @@
+relationship dd5049e6-ed3a-d583-15da-145e720f1c19
+	fromColumn: fact_price_paid.location_id
+	toColumn: dim_location.location_id
+
+relationship df0e3eb6-34b1-071b-5134-744f79a45d9c
+	fromColumn: fact_price_paid.year_month
+	toColumn: dim_date.year_month
+

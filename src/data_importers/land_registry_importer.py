@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class LandRegstryImporter:
+class LandRegistryImporter:
 
     HOUSE_PRICE_BASE_URL = "http://prod.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/"
 
@@ -28,6 +28,12 @@ class LandRegstryImporter:
         
             remote_file_url = f"{self.HOUSE_PRICE_BASE_URL}{file_name}"
             path_to_save_file = self.raw_data_download_path + "/" + file_name
+
+            # Check if the file already exists to avoid unnecessary downloads
+            fs, _ = fsspec.url_to_fs(path_to_save_file, **self.storage_options)
+            if fs.exists(path_to_save_file):
+                logger.info(f"File {file_name} already exists at {path_to_save_file}. Skipping download.")
+                continue
 
             # Download the CSV file with streaming enabled to avoid OOM on limited memory
             with requests.get(remote_file_url, stream=True) as response:

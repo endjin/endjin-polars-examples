@@ -1,0 +1,64 @@
+table dim_location
+	lineageTag: 2aacca97-691f-4905-b5a0-2dd86155c1b6
+	sourceLineageTag: [gold].[dim_location]
+
+	column county
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 3e101b97-0c1e-45d3-822a-c848ae373000
+		sourceLineageTag: county
+		summarizeBy: none
+		sourceColumn: county
+
+		annotation SummarizationSetBy = Automatic
+
+	column district
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: afb18f37-d2c9-497c-a746-88ee5ebd3290
+		sourceLineageTag: district
+		summarizeBy: none
+		sourceColumn: district
+
+		annotation SummarizationSetBy = Automatic
+
+	column town_city
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 6e3f716b-3530-4f94-b797-9740a2a5aa0c
+		sourceLineageTag: town_city
+		summarizeBy: none
+		sourceColumn: town_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column postcode_area
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 78134b27-56d6-4af7-9f9d-3e9d1a707298
+		sourceLineageTag: postcode_area
+		summarizeBy: none
+		sourceColumn: postcode_area
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: d55f3701-1b27-4a6d-bc52-17aa6b20903e
+		sourceLineageTag: location_id
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_location = entity
+		mode: directLake
+		source
+			entityName: dim_location
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

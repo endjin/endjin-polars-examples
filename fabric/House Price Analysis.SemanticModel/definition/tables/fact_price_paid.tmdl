@@ -1,0 +1,135 @@
+table fact_price_paid
+	lineageTag: 32a421fe-b4f6-4e4e-a297-71d890533af0
+	sourceLineageTag: [gold].[fact_price_paid]
+
+	measure 'Count of Properties Sold' = COUNTROWS(fact_price_paid)
+		formatString: 0
+		lineageTag: 5400719a-21fb-4ce5-a226-6afaf0443ea5
+
+		changedProperty = Name
+
+	measure 'Median Price' = MEDIAN(fact_price_paid[median_price])
+		formatString: "£"#,0;-"£"#,0;"£"#,0
+		lineageTag: cd70b3cf-c43c-4b79-8171-62465885baf6
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	measure 'Max Price' = MAX(fact_price_paid[max_price])
+		formatString: "£"#,0;-"£"#,0;"£"#,0
+		lineageTag: 72d838a4-1718-4332-8b28-4bdb9a34b60f
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	measure 'Min Price' = MIN(fact_price_paid[min_price])
+		formatString: "£"#,0;-"£"#,0;"£"#,0
+		lineageTag: 3ce5b900-d946-4539-9889-a5b0f12d1cfe
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-GB"}
+
+	column property_type
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 93955813-02ed-4e1b-a059-426d1cf2d22c
+		sourceLineageTag: property_type
+		summarizeBy: none
+		sourceColumn: property_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column old_new
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: cafec8c7-d328-48b2-a648-d8b1f340d2f0
+		sourceLineageTag: old_new
+		summarizeBy: none
+		sourceColumn: old_new
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: b4d59744-231a-4284-bd68-5b154ffaf29c
+		sourceLineageTag: location_id
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month
+		dataType: string
+		sourceProviderType: varchar(8000)
+		lineageTag: 386605e9-bae9-4c58-a468-f2996b58fb63
+		sourceLineageTag: year_month
+		summarizeBy: none
+		sourceColumn: year_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column min_price
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: fc81b3c1-6480-425f-a770-6e20954d08d4
+		sourceLineageTag: min_price
+		summarizeBy: sum
+		sourceColumn: min_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column median_price
+		dataType: double
+		sourceProviderType: float
+		lineageTag: 0ab2ca2e-c930-477a-aa3d-be6f93ee3cee
+		sourceLineageTag: median_price
+		summarizeBy: sum
+		sourceColumn: median_price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column max_price
+		dataType: int64
+		formatString: 0
+		sourceProviderType: bigint
+		lineageTag: 7659ae41-da20-451e-a5da-e463289ed2db
+		sourceLineageTag: max_price
+		summarizeBy: sum
+		sourceColumn: max_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_count
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 656d1b24-9f98-4c79-8752-63c6d94d2705
+		sourceLineageTag: transaction_count
+		summarizeBy: sum
+		sourceColumn: transaction_count
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_price_paid = entity
+		mode: directLake
+		source
+			entityName: fact_price_paid
+			schemaName: gold
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,6 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "behave-vsc.featuresPath": "tests/bdd",
+    "demoTime.defaultFileType": "json",
+    "claudeCode.useTerminal": true
+}
