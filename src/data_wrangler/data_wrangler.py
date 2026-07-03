@@ -377,7 +377,7 @@ class DataWrangler:
         return None
 
     @staticmethod
-    def build_date_dimension(min_date: date, max_date: date) -> pl.DataFrame:
+    def build_monthly_date_dimension(min_date: date, max_date: date) -> pl.DataFrame:
         """
         Builds a monthly date dimension table for the inclusive range [min_date, max_date].
 
@@ -407,6 +407,57 @@ class DataWrangler:
         )
         logger.info(f"    Date range: {start_month} to {end_month} ({len(result):,} months)")
         return result
+
+    @staticmethod
+    def build_daily_date_dimension(min_date: date, max_date: date) -> pl.DataFrame:
+        """
+        Builds a daily date dimension table for the inclusive range [min_date, max_date].
+
+        Args:
+            min_date: First date in the range.
+            max_date: Last date in the range (inclusive).
+
+        Returns:
+            DataFrame with columns:
+            year_month - YYYY-MM format of the date
+            year - Year of the date
+            quarter - Quarter of the date
+            month - Month of the date
+            month_name - Name of the month
+            day_of_month - Day of the month
+            day_name - Name of the day
+            week - Week of the year
+            weekday - Day of the week (0=Monday, 6=Sunday)
+            is_weekend - Boolean indicating if the date is a weekend
+            day_of_year - Day of the year
+            iso_calendar - ISO calendar date
+        """
+        logger.info(" → Building date dimension...")
+        # Generate daily range
+        start_date = min_date
+        end_date = max_date
+        
+        result = (
+            pl.date_range(start=start_date, end=end_date, interval="1d", eager=True)
+            .to_frame(name="date")
+            .with_columns(
+                pl.col("date").dt.strftime("%Y-%m").alias("year_month"),
+                pl.col("date").dt.year().alias("year"),
+                pl.col("date").dt.quarter().alias("quarter"),
+                pl.col("date").dt.month().alias("month"),
+                pl.col("date").dt.strftime("%B").alias("month_name"),
+                pl.col("date").dt.day().alias("day_of_month"),
+                pl.col("date").dt.strftime("%A").alias("day_name"),
+                pl.col("date").dt.week().alias("week"),
+                pl.col("date").dt.weekday().alias("weekday"),
+                pl.col("date").dt.is_weekend().alias("is_weekend"),
+                pl.col("date").dt.ordinal_day().alias("day_of_year"),
+                pl.col("date").dt.isocalendar().alias("iso_calendar"),
+            )
+        )
+        logger.info(f"Date range: {start_date} to {end_date} ({len(result):,} days)")
+        return result
+
 
     @staticmethod
     def build_location_dimension(df: pl.DataFrame) -> pl.DataFrame:
